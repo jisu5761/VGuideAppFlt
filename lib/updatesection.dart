@@ -177,12 +177,14 @@ class _UpdateSectionState extends State<UpdateSection> {
                       style:
                       ElevatedButton.styleFrom(minimumSize: Size(80, 60)),
                       onPressed: () async {
-                        final result = await OpenFile.open(pickedFile!.path);
+                        // final result = await OpenFile.open(pickedFile!.path);
                         // if(result.message == "done")
-                        // {
-                          _sendcommand(0x45);
-                        //   _startTimer();
-                        // }
+                        {
+                          Uint8List bytes = pickedFile!.readAsBytesSync();
+
+                          _sendcommand(0xFF);
+                          _startTimer();
+                        }
 
                       },
                       icon: Icon(

@@ -60,15 +60,14 @@ class _TabSectionState extends State<TabSection> {
     // });
 
     await widget.device.connect();
+    final mtu = await widget.device.mtu.first;
+    await widget.device.requestMtu(512);
+    // while (mtu != 200) {
+    //   print("Waiting for requested MTU");
+    //   await Future.delayed(Duration(seconds: 1));
+    // }
     discoverServices();
 
-    await widget.device.requestMtu(259);
-    int mtu = await widget.device.mtu.first;
-    while (mtu != 259) {
-      print("Waiting for requested MTU");
-      await Future.delayed(Duration(seconds: 1));
-      mtu = await widget.device.mtu.first;
-    }
   }
 
   disconnectFromDevice() {
