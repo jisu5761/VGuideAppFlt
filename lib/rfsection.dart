@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:provider/provider.dart';
 import 'blueprovider.dart';
 import 'constants.dart';

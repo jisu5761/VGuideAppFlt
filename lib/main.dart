@@ -12,7 +12,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:sguideappflt/tabsection.dart';
 import 'package:sguideappflt/widgets.dart';
-import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:provider/provider.dart';
 import 'package:sguideappflt/blueprovider.dart';
 import 'constants.dart';
@@ -54,12 +54,12 @@ class FlutterBlueApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: ColorService.createMaterialColor(const Color(0xFF0000FF)),
       ),
-      home: StreamBuilder<BluetoothState>(
+      home: StreamBuilder<BleStatus>(
           stream: FlutterBlue.instance.state,
-          initialData: BluetoothState.unknown,
+          initialData: BleStatus.unknown,
           builder: (c, snapshot) {
             final state = snapshot.data;
-            if (state == BluetoothState.on) {
+            if (state == BleStatus.ready) {
               return FindDevicesScreen();
             }
             return BluetoothOffScreen(state: state!);
@@ -71,7 +71,7 @@ class FlutterBlueApp extends StatelessWidget {
 class BluetoothOffScreen extends StatelessWidget {
   const BluetoothOffScreen({Key? key, required this.state}) : super(key: key);
 
-  final BluetoothState state;
+  final BleStatus state;
 
   @override
   Widget build(BuildContext context) {

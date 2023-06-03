@@ -41,14 +41,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.17.2"
-  convert:
-    dependency: transitive
-    description:
-      name: convert
-      sha256: f08428ad63615f96a27e34221c65e1a451439b5f26030f78d790f461c686d65d
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.1"
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -102,14 +94,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_blue:
-    dependency: "direct main"
-    description:
-      name: flutter_blue
-      sha256: f7f76b9b80455b0375693ec96c276fadb01e94d8441fa1740a64980cd1aeda5c
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.8.0"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -126,6 +110,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.5"
+  flutter_reactive_ble:
+    dependency: "direct main"
+    description:
+      name: flutter_reactive_ble
+      sha256: "9eea5244d1958608f22e96dcb2ee459f7f37434b28e43c0a829276b6dc7d1aaa"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.3"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -136,6 +128,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  functional_data:
+    dependency: transitive
+    description:
+      name: functional_data
+      sha256: "78c40eecabd08b46faa7fb394ed4d9a25a4b66d5aba7cf6940509fd365a62098"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   js:
     dependency: transitive
     description:
@@ -304,14 +304,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.2"
-  rxdart:
+  reactive_ble_mobile:
     dependency: transitive
     description:
-      name: rxdart
-      sha256: "2ef8b4e91cb3b55d155e0e34eeae0ac7107974e451495c955ac04ddee8cc21fd"
+      name: reactive_ble_mobile
+      sha256: "616a5ad9bc96fe051414a41b133e13f75ef35e6d8db77c84f0527a43afbf614e"
       url: "https://pub.dev"
     source: hosted
-    version: "0.26.0"
+    version: "5.0.3"
+  reactive_ble_platform_interface:
+    dependency: transitive
+    description:
+      name: reactive_ble_platform_interface
+      sha256: f9a446150076f1601c397b6bbf554eda2c37b066bb7397a226e72f04c13dbd9b
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.3"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -365,14 +373,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.0"
-  typed_data:
-    dependency: transitive
-    description:
-      name: typed_data
-      sha256: "53bdf7e979cfbf3e28987552fd72f637e63f3c8724c9e56d9246942dc2fa36ee"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.3.0"
   vector_math:
     dependency: transitive
     description:

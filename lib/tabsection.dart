@@ -2,7 +2,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:sguideappflt/main.dart';
 import 'package:sguideappflt/rfsection.dart';
 import 'package:sguideappflt/soundsection.dart';
@@ -15,8 +15,8 @@ import 'constants.dart';
 
 class TabSection extends StatefulWidget {
   const TabSection({Key? key, required this.device}) : super(key: key);
-  final BluetoothDevice device;
-  final BluetoothDeviceState deviceState = BluetoothDeviceState.disconnected;
+  final FlutterReactiveBle  device;
+  final BleStatus deviceState = BleStatus.unauthorized;
 
   @override
   State<TabSection> createState() => _TabSectionState();

@@ -4,7 +4,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';

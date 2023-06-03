@@ -3,7 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:sguideappflt/constants.dart';
 import 'package:sguideappflt/tabsection.dart';
 
