@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_blue/flutter_blue.dart';
@@ -23,10 +24,15 @@ class _UpdateSectionState extends State<UpdateSection> {
   late BlueProvider _blueProvider;
   FilePickerResult? filePickerResult;
   File? pickedFile;
+  late Uint8List filebytes;
+  // Uint8List cmdbytes = Uint8List(256 + 3);
   bool _isRunning = false;
+  int fidx = 0;
   int _seconds = 0;
+  int s_mode = 0;
   late Timer _timer;
   var _openResult = 'Unknown';
+  String rcvoldcmd = '0';
   String _rf235Value = '30';
   FocusNode _gnumFocus = FocusNode();
   FocusNode _gcountFocus = FocusNode();
@@ -61,14 +67,104 @@ class _UpdateSectionState extends State<UpdateSection> {
     '95',
     '100'
   ];
+  int crc16umts(List<int> bytes) {
+    int crc = 0x0000;
+    const int polynomial = 0x8005;
+    for (final byte in bytes) {
+      crc ^= byte << 8;
+      for (int i = 0; i < 8; i++) {
+        if ((crc & 0x8000) != 0) {
+          crc = (crc << 1) ^ polynomial;
+        } else {
+          crc <<= 1;
+        }
+      }
+    }
+    return crc & 0xFFFF;
+  }
+
   void _startTimer() {
     _isRunning = true;
     _timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
 
+      switch(s_mode)
+      {
+        case  0:
+                  rcvoldcmd = '0';
+                  _sendcommand(0x45);
+                  s_mode ++;
+                  break;
+
+        case  1:  if(rcvoldcmd == 'E')
+                  {
+                    filebytes = pickedFile!.readAsBytesSync();
+                    List<int> cmdbytes = [];
+                    cmdbytes.add(0xF2);
+                    cmdbytes.add(1);
+                    cmdbytes.add(1);
+                    cmdbytes.add(0x4D);
+                    int i = 0;
+                    for(i = 0;i < 256; i ++) {
+                      cmdbytes.add(filebytes[fidx ++]);
+                      if(fidx == filebytes.lengthInBytes)
+                        {
+                          break;
+                        }
+                    }
+                    cmdbytes.add(0xF3);
+                    int crc16 = crc16umts(cmdbytes);
+                    cmdbytes.add(crc16 & 0xFF);
+                    cmdbytes.add(crc16 >> 8);
+                    print("cmdbytes.length = ");
+                    print(cmdbytes.length);
+
+                    _senddata('M',cmdbytes, cmdbytes.length);
+                    rcvoldcmd = '0';
+                    s_mode ++;
+                  }
+                  break;
+
+        case  2:  if(rcvoldcmd == 'M')
+                  {
+                    List<int> cmdbytes = [];
+                    cmdbytes.add(0xF2);
+                    cmdbytes.add(1);
+                    cmdbytes.add(1);
+                    cmdbytes.add(0x4D);
+                    int i = 0;
+                    for(i = 0;i < 256; i ++) {
+                      cmdbytes.add(filebytes[fidx ++]);
+                      if(fidx == filebytes.lengthInBytes)
+                      {
+                        break;
+                      }
+                    }
+                    cmdbytes.add(0xF3);
+                    int bcc = 0;
+                    cmdbytes.forEach((num) {
+                      bcc ^= num;
+                    });
+                    cmdbytes.add(bcc);
+                    _senddata('M',cmdbytes, cmdbytes.length);
+                    rcvoldcmd = '0';
+                  }
+                  break;
+
+        case  3:
+                  break;
+      }
+
       //_sendcommand(0x3D);   //'='
     });
   }
+  void _stopTimer() {
+    if(_isRunning)
+      {
+        _isRunning = false;
+        _timer.cancel();
 
+      }
+  }
   getImageorVideoFromGallery(context) async {
     // filePickerResult = await FilePicker.platform.pickFiles();
     filePickerResult = await FilePicker.platform.pickFiles(type: FileType.any);
@@ -91,6 +187,7 @@ class _UpdateSectionState extends State<UpdateSection> {
   }
   @override
   Widget build(BuildContext context)  {
+
     _blueProvider = Provider.of<BlueProvider>(context, listen: false);
 
     _rf235Value = (Provider.of<BlueProvider>(context).rf235value.toString());
@@ -104,6 +201,12 @@ class _UpdateSectionState extends State<UpdateSection> {
     (Provider
         .of<BlueProvider>(context)
         .groupMemberCount
+        .toString());
+
+    rcvoldcmd =
+    (Provider
+        .of<BlueProvider>(context)
+        .oldcmd
         .toString());
     return GestureDetector(
       onTap: () {
@@ -180,9 +283,10 @@ class _UpdateSectionState extends State<UpdateSection> {
                         // final result = await OpenFile.open(pickedFile!.path);
                         // if(result.message == "done")
                         {
-                          Uint8List bytes = pickedFile!.readAsBytesSync();
+                          _stopTimer();
+                          s_mode = 0;
 
-                          _sendcommand(0xFF);
+
                           _startTimer();
                         }
 
@@ -290,10 +394,10 @@ class _UpdateSectionState extends State<UpdateSection> {
   _senddtabuf(List<int> cmd) async {
     List<BluetoothService> services = await widget.device.discoverServices();
     services.forEach((service) {
-      if (service.uuid.toString() == HAN_UART_SERVICE) {
+      if (service.uuid.toString() == WOO_UART_SERVICE) {
         List<BluetoothCharacteristic> blueChar = service.characteristics;
         blueChar.forEach((f) {
-          if (f.uuid.toString().compareTo(HAN_UART_READ_CHARACTERISTIC) == 0) {
+          if (f.uuid.toString().compareTo(WOO_UART_READ_CHARACTERISTIC) == 0) {
             f.write(cmd, withoutResponse: true);
           }
         });
@@ -308,8 +412,8 @@ class _UpdateSectionState extends State<UpdateSection> {
         List<BluetoothCharacteristic> blueChar = service.characteristics;
         blueChar.forEach((f) {
           if (f.uuid.toString().compareTo(WOO_UART_READ_CHARACTERISTIC) == 0) {
-            // debugPrint("${service.uuid}");
-            // debugPrint("Characteristice =  ${f.uuid}");
+            debugPrint("${service.uuid}");
+            debugPrint("Characteristice =  ${f.uuid}");
             List<int> cmdList = [
               0x02,
               0x00,
@@ -334,35 +438,15 @@ class _UpdateSectionState extends State<UpdateSection> {
             int bcc = 0;
             cmdList[1] = cmd!;
             if (cmd == 0x51) {
-              //'Q'
-              try {
-                bcc = int.parse("0x" + gruopNumberContoller.text.toString());
-//                bcc = int.parse("0xAA");
-                cmdList[2] = (bcc >> 24) & 0xFF;
-                cmdList[3] = (bcc >> 16) & 0xFF;
-                cmdList[4] = (bcc >> 8) & 0xFF;
-                cmdList[5] = bcc & 0xFF;
-                bcc = int.parse(gruopMemberCountContoller.text.toString());
-                cmdList[6] = bcc & 0xFF;
-                bcc = int.parse(gruopMemberIDContoller.text.toString());
-                cmdList[7] = bcc & 0xFF;
-              } catch (e) {
-                debugPrint(e.toString());
-                showAlertDialog('묶음번호 입력 오류', '입력가능 ( 0~9,A~F)');
-                return;
-              }
             }
             else if (cmd == 0x71) {}
-            else if (cmd == 0x3D) {
-              cmdList[2] = _blueProvider.rf235value;
+            else if (cmd == 0x45) {
             }
             bcc = 0;
             cmdList.forEach((num) {
               bcc ^= num;
             });
             cmdList.add(bcc);
-            for(int i = 0; i < 255;  i++)
-              cmdList.add(i);
             f.write(cmdList, withoutResponse: false);
             debugPrint('CMD = ' + cmdList.toString());
           }
@@ -370,7 +454,40 @@ class _UpdateSectionState extends State<UpdateSection> {
       }
     });
   }
+  String dumpHexToString(List<int> data) {
+    StringBuffer sb = StringBuffer();
+    data.forEach((f) {
+      sb.write(f.toRadixString(16).padLeft(2, '0'));
+      sb.write(" ");
+    });
+    return sb.toString();
+  }
 
+  String conertHexDecimal(String str1) {
+    final fullString = str1;
+    int number = 0;
+    for (int i = 0; i <= fullString.length - 8; i += 8) {
+      final hex = fullString.substring(i, i + 8);
+
+      number = int.parse(hex, radix: 16);
+      print(number);
+    }
+    return number.toString();
+  }
+  _senddata(String? cmd,List<int> buf, int lng) async {
+    List<BluetoothService> services = await widget.device.discoverServices();
+    services.forEach((service) {
+      if (service.uuid.toString() == WOO_UART_SERVICE) {
+        List<BluetoothCharacteristic> blueChar = service.characteristics;
+        blueChar.forEach((f) {
+          if (f.uuid.toString().compareTo(WOO_UART_READ_CHARACTERISTIC) == 0) {
+            f.write(buf, withoutResponse: true);
+            debugPrint('CMD = ' + dumpHexToString(buf));
+          }
+        });
+      }
+    });
+  }
   void showAlertDialog(String msg1, String msg2) async {
     String result = await showDialog(
       context: context,

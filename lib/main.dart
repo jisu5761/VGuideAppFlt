@@ -202,11 +202,7 @@ class _FindDevicesScreenState extends State<FindDevicesScreen> {
             } else {
               String _scanUuid, _writecharacter;
 
-              if (uuidsel == 0) {
                 _scanUuid = WOO_UART_SERVICE;
-              } else {
-                _scanUuid = HAN_UART_SERVICE;
-              }
               return FloatingActionButton(
                   child: Icon(Icons.search),
                   onPressed: () {
@@ -235,7 +231,7 @@ class HomePage extends StatelessWidget {
     return RefreshIndicator(
         onRefresh: () => FlutterBlue.instance.startScan(
             scanMode: ScanMode.balanced,
-            withServices: [Guid(HAN_UART_SERVICE)],
+            withServices: [Guid(WOO_UART_SERVICE)],
             timeout: Duration(seconds: 4)),
         child: SingleChildScrollView(
           child: Column(

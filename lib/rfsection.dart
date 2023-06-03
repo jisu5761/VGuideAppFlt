@@ -270,10 +270,10 @@ class _RfSection extends State<RfSection> {
   _sendcommand(int? cmd) async {
     List<BluetoothService> services = await widget.device.discoverServices();
     services.forEach((service) {
-      if (service.uuid.toString() == HAN_UART_SERVICE) {
+      if (service.uuid.toString() == WOO_UART_SERVICE) {
         List<BluetoothCharacteristic> blueChar = service.characteristics;
         blueChar.forEach((f) {
-          if (f.uuid.toString().compareTo(HAN_UART_READ_CHARACTERISTIC) == 0) {
+          if (f.uuid.toString().compareTo(WOO_UART_READ_CHARACTERISTIC) == 0) {
             debugPrint("${service.uuid}");
             debugPrint("Characteristice =  ${f.uuid}");
             List<int> cmdList = [

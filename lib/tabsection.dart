@@ -62,6 +62,7 @@ class _TabSectionState extends State<TabSection> {
     await widget.device.connect();
     final mtu = await widget.device.mtu.first;
     await widget.device.requestMtu(512);
+
     // while (mtu != 200) {
     //   print("Waiting for requested MTU");
     //   await Future.delayed(Duration(seconds: 1));
@@ -87,13 +88,8 @@ class _TabSectionState extends State<TabSection> {
     List<BluetoothService> services = await widget.device.discoverServices();
     services.forEach((service) {
 
-      if (uuidsel == 0) {
         _scanUuid = WOO_UART_SERVICE;
         _writecharacter  = WOO_UART_WRITE_CHARACTERISTIC;
-      } else {
-        _scanUuid = HAN_UART_SERVICE;
-        _writecharacter = HAN_UART_WRITE_CHARACTERISTIC;
-      }
       print(service.uuid.toString());
       print(_scanUuid);
       if (service.uuid.toString().toUpperCase() == _scanUuid.toUpperCase()) {

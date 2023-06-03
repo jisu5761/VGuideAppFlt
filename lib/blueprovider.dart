@@ -58,6 +58,7 @@ class BlueProvider extends ChangeNotifier {
   int _rf235value = 30;
   int _beaconrssicutvalue = 127;
   int _beaconrssivalue= 100;
+  String _oldcmd = '0';
 
 
   int _nightOffset = 4;
@@ -98,6 +99,8 @@ class BlueProvider extends ChangeNotifier {
   int get beaconrssicutvalue => _beaconrssicutvalue;
 
   int get beaconrssi => _beaconrssivalue;
+
+  String get oldcmd => _oldcmd;
 
   String get groupNumber => _groupNumber;
 
@@ -170,8 +173,20 @@ class BlueProvider extends ChangeNotifier {
       bleinfo[i++] = value;
       return value;
     }).toList();
-    debugPrint('cmd = ' + String.fromCharCode(bleinfo[1]));
+      debugPrint('cmd = ' + String.fromCharCode(bleinfo[1]));
     switch (String.fromCharCode(bleinfo[1])) {
+
+      case 'E':
+                _oldcmd = String.fromCharCode(bleinfo[1]);
+                break;
+
+      case 'M':
+      _oldcmd = String.fromCharCode(bleinfo[1]);
+      break;
+
+      case 'N':
+      _oldcmd = String.fromCharCode(bleinfo[1]);
+      break;
 
 
       case '0':
