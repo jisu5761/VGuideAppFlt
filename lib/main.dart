@@ -12,7 +12,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:sguideappflt/tabsection.dart';
 import 'package:sguideappflt/widgets.dart';
-import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:sguideappflt/blueprovider.dart';
 import 'constants.dart';
@@ -55,7 +55,7 @@ class FlutterBlueApp extends StatelessWidget {
         primarySwatch: ColorService.createMaterialColor(const Color(0xFF0000FF)),
       ),
       home: StreamBuilder<BluetoothState>(
-          stream: FlutterBlue.instance.state,
+          stream: FlutterBluePlus.instance.state,
           initialData: BluetoothState.unknown,
           builder: (c, snapshot) {
             final state = snapshot.data;
@@ -190,13 +190,13 @@ class _FindDevicesScreenState extends State<FindDevicesScreen> {
         ),
         body: HomePage(),
         floatingActionButton: StreamBuilder<bool>(
-          stream: FlutterBlue.instance.isScanning,
+          stream: FlutterBluePlus.instance.isScanning,
           initialData: false,
           builder: (c, snapshot) {
             if (snapshot.data!) {
               return FloatingActionButton(
                 child: Icon(Icons.stop),
-                onPressed: () => FlutterBlue.instance.stopScan(),
+                onPressed: () => FlutterBluePlus.instance.stopScan(),
                 backgroundColor: Colors.blueAccent,
               );
             } else {
@@ -208,7 +208,7 @@ class _FindDevicesScreenState extends State<FindDevicesScreen> {
                   onPressed: () {
                     //FlutterBlue.instance.scanResults
                     // FlutterBlue.instance.resetScanResult();
-                    FlutterBlue.instance.startScan(scanMode: ScanMode.balanced,
+                    FlutterBluePlus.instance.startScan(scanMode: ScanMode.balanced,
                         withServices: [Guid(_scanUuid)],
                         timeout: Duration(seconds: 4),);
                   }
@@ -229,7 +229,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-        onRefresh: () => FlutterBlue.instance.startScan(
+        onRefresh: () => FlutterBluePlus.instance.startScan(
             scanMode: ScanMode.balanced,
             withServices: [Guid(WOO_UART_SERVICE)],
             timeout: Duration(seconds: 4)),
@@ -237,7 +237,7 @@ class HomePage extends StatelessWidget {
           child: Column(
             children: <Widget>[
               StreamBuilder<List<ScanResult>>(
-                stream: FlutterBlue.instance.scanResults,
+                stream: FlutterBluePlus.instance.scanResults,
                 initialData: [],
                 builder: (c, snapshot) => Column(
                   children: snapshot.data!

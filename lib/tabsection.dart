@@ -2,7 +2,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:sguideappflt/main.dart';
 import 'package:sguideappflt/rfsection.dart';
 import 'package:sguideappflt/soundsection.dart';
